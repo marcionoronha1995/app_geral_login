@@ -30,11 +30,7 @@ class V8Sentinel:
         def decorator(func):
             @functools.wraps(func)
             def wrapper(*args, **kwargs):
-                # 1. Verifica se o ambiente está limpo (Sem desktop.ini ou lixo)
-                if os.path.exists("desktop.ini"):
-                    os.remove("desktop.ini")  # Manutenção automática
-
-                # 2. Verifica a Chave de Segurança no .env
+                # Verifica a Chave de Segurança em memória
                 current_key = os.getenv("V8_MASTER_KEY")
                 if not current_key or len(current_key) < 32:
                     raise PermissionError("❌ Chave de segurança inválida ou ausente.")

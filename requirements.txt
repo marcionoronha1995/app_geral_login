@@ -1,0 +1,6 @@
+python-dotenv
+flask
+pandas
+openpyxl
+ruff
+jupyter_http_over_ws

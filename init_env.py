@@ -4,15 +4,29 @@ import pathlib
 import subprocess
 import sys
 
-# Lista de dependências essenciais para o seu projeto
-REQUIREMENTS = [
-    "python-dotenv",
-    "flask",
-    "pandas",
-    "openpyxl",
-    "ruff",
-    "jupyter_http_over_ws",
-]
+# Garante saída UTF-8 no console do Windows para evitar erros de codificação com emojis
+if hasattr(sys.stdout, "reconfigure"):
+    sys.stdout.reconfigure(encoding="utf-8")
+
+# Lista de dependências essenciais lidas a partir de requirements.txt
+def get_requirements():
+    root = pathlib.Path(__file__).parent.resolve()
+    req_file = root / "requirements.txt"
+    if req_file.exists():
+        with open(req_file, "r", encoding="utf-8") as f:
+            return [line.strip() for line in f if line.strip() and not line.strip().startswith("#")]
+    # Fallback caso o arquivo não seja encontrado
+    return [
+        "python-dotenv",
+        "flask",
+        "pandas",
+        "openpyxl",
+        "ruff",
+        "jupyter_http_over_ws",
+    ]
+
+
+REQUIREMENTS = get_requirements()
 
 
 def detect_environment():

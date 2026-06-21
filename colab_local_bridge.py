@@ -1,5 +1,10 @@
 import pathlib
 import subprocess
+import sys
+
+# Garante saída UTF-8 no console do Windows para evitar erros de codificação com emojis
+if hasattr(sys.stdout, "reconfigure"):
+    sys.stdout.reconfigure(encoding="utf-8")
 
 
 def launch_colab_local_server():

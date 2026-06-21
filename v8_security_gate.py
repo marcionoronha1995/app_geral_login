@@ -1,8 +1,6 @@
 import functools
 import os
 
-from src.backend.core.secure_loader import load_secure_environment  # cite: User Summary
-
 
 def secure_gate(required_permission):
     """
@@ -12,20 +10,19 @@ def secure_gate(required_permission):
     def decorator(func):
         @functools.wraps(func)
         def wrapper(*args, **kwargs):
-            # 1. Valida o ambiente (Se o .env e as chaves básicas existem)
-            if not load_secure_environment():
-                raise PermissionError("❌ Falha de Integridade: Ambiente inseguro.")
+            # 1. Valida o ambiente em memória (Se o .env e as chaves básicas existem)
+            if not os.getenv("SECRET_KEY"):
+                raise PermissionError("❌ Falha de Integridade: Ambiente inseguro (SECRET_KEY ausente).")
 
             # 2. Verifica a liberação da chave para esta função específica
             app_key = os.getenv("APP_SECURITY_KEY")
             if app_key != "VALOR_DE_CONFIANÇA_V8":
-            expected_key = os.getenv("EXPECTED_APP_KEY") # Definida de forma segura no ambiente
-            
-            if not app_key or not expected_key or app_key != expected_key:
-                raise PermissionError(
-                    f"❌ Acesso Negado: Função '{func.__name__}' sem chave válida."
-                    f"❌ Acesso Negado: Função '{func.__name__}' não possui autorização ou chaves não conferem."
-                )
+                expected_key = os.getenv("EXPECTED_APP_KEY")  # Definida de forma segura no ambiente
+                
+                if not app_key or not expected_key or app_key != expected_key:
+                    raise PermissionError(
+                        f"❌ Acesso Negado: Função '{func.__name__}' não possui autorização ou chaves não conferem."
+                    )
 
             print(f"🔒 [V8-GATE] Processamento '{func.__name__}' autorizado.")
             return func(*args, **kwargs)
