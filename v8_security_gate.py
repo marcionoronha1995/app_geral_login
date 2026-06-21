@@ -19,8 +19,12 @@ def secure_gate(required_permission):
             # 2. Verifica a liberação da chave para esta função específica
             app_key = os.getenv("APP_SECURITY_KEY")
             if app_key != "VALOR_DE_CONFIANÇA_V8":
+            expected_key = os.getenv("EXPECTED_APP_KEY") # Definida de forma segura no ambiente
+            
+            if not app_key or not expected_key or app_key != expected_key:
                 raise PermissionError(
                     f"❌ Acesso Negado: Função '{func.__name__}' sem chave válida."
+                    f"❌ Acesso Negado: Função '{func.__name__}' não possui autorização ou chaves não conferem."
                 )
 
             print(f"🔒 [V8-GATE] Processamento '{func.__name__}' autorizado.")

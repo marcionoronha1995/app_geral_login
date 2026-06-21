@@ -8,6 +8,8 @@ from flask import Flask
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../../")))
 
 from src.backend.core.secure_loader import load_secure_environment
+from v8_security_gate import secure_gate
+from v8_sentinel import sentinel
 
 app = Flask(__name__)
 
@@ -27,6 +29,17 @@ def index():
         "modulo": "Core Login",
         "tecnologia": "Flask + Python 3.14",
         "ambiente": "Desenvolvimento",
+    }
+
+
+# Nova Rota Protegida pelos Cadeados do V8
+@app.route("/api/v1/protegido")
+@sentinel.validate_gate(required_key_level="MASTER")
+@secure_gate(required_permission="EXECUTE_TASK")
+def rota_protegida():
+    return {
+        "status": "Sucesso",
+        "mensagem": "Acesso concedido! O ambiente é seguro e as chaves são válidas.",
     }
 
 
