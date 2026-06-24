@@ -41,14 +41,30 @@ def detect_environment():
 def install_missing_dependencies():
     """Verifica e instala bibliotecas faltantes usando importlib (Padrão Python 3.14)."""
     missing = []
+    
+    # Mapeia o nome do pacote para a string completa de instalação
+    packages_to_check = {}
     for x in REQUIREMENTS:
+        # Extrai o nome limpo do pacote (antes de ==, >=, etc.)
+        pkg_name = x.split("==")[0].split(">=")[0].split("<=")[0].split(" ")[0].strip()
+        # Normaliza para o formato padrão do importlib.metadata
+        pkg_name = pkg_name.replace("_", "-").lower()
+        packages_to_check[pkg_name] = x
+
+    for pkg_name, full_spec in packages_to_check.items():
         try:
-            importlib.metadata.version(x)
+            importlib.metadata.version(pkg_name)
         except importlib.metadata.PackageNotFoundError:
-            missing.append(x)
+            # Caso especial para pacotes que usam nomes diferentes no importlib vs pip
+            # jupyter_http_over_ws pode ser verificado como jupyter-http-over-ws
+            missing.append(full_spec)
 
     if missing:
         print(f"📦 Bibliotecas faltantes: {', '.join(missing)}")
+        if detect_environment() != "LOCAL":
+            print("🚨 ERRO: Execução em produção/nuvem detectada. Não é permitida a instalação dinâmica de pacotes via pip.")
+            sys.exit(1)
+            
         print("Wait... Sincronizando ambiente...")
         try:
             # sys.executable garante o uso do seu .venv
@@ -56,6 +72,7 @@ def install_missing_dependencies():
             print("✅ Sincronização concluída.")
         except Exception as e:
             print(f"❌ Erro na instalação: {e}")
+            sys.exit(1)
     else:
         print("💎 Ambiente 100% atualizado.")
 

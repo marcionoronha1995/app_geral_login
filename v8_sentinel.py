@@ -2,6 +2,8 @@ import functools
 import hashlib
 import os
 
+from src.backend.core.exceptions import V8SecurityException
+
 
 class V8Sentinel:
     """
@@ -33,7 +35,7 @@ class V8Sentinel:
                 # Verifica a Chave de Segurança em memória
                 current_key = os.getenv("V8_MASTER_KEY")
                 if not current_key or len(current_key) < 32:
-                    raise PermissionError("❌ Chave de segurança inválida ou ausente.")
+                    raise V8SecurityException("❌ Chave de segurança inválida ou ausente.")
 
                 print(f"🔒 [SENTINEL] Função '{func.__name__}' validada com sucesso.")
                 return func(*args, **kwargs)

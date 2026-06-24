@@ -1,12 +1,23 @@
 import os
 import pathlib
 import sys
+import logging
 
 # Garante saída UTF-8 no console do Windows para evitar erros de codificação com emojis
 if hasattr(sys.stdout, "reconfigure"):
     sys.stdout.reconfigure(encoding="utf-8")
 
 from dotenv import load_dotenv
+
+# Configuração do Logger Estruturado V8
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s [%(levelname)s] (%(name)s) %(message)s",
+    handlers=[
+        logging.StreamHandler(sys.stdout)
+    ]
+)
+logger = logging.getLogger("V8Core")
 
 
 def get_project_root():
@@ -23,18 +34,19 @@ def cleanup_system_files():
     root = get_project_root()
     count = 0
 
-    print(f"🔍 Iniciando varredura em: {root}")
+    logger.info("🔍 Iniciando varredura em: %s", root)
 
     # rglob busca de forma recursiva apenas dentro do diretório raiz definido
     for path in root.rglob("desktop.ini"):
         try:
             path.unlink()  # Remove o arquivo
             count += 1
-        except Exception:
-            # Silencia erros de permissão em arquivos específicos, se houver
+        except Exception as e:
+            # Registra o erro em modo debug em vez de silenciar cegamente
+            logger.debug("Falha ao remover arquivo de sistema %s: %s", path, e)
             continue
 
-    print(f"🧹 Limpeza concluída: {count} arquivos removidos.")
+    logger.info("🧹 Limpeza concluída: %d arquivos removidos.", count)
 
 
 def load_secure_environment():
@@ -43,17 +55,17 @@ def load_secure_environment():
     env_path = root / ".env"
 
     if not env_path.exists():
-        print(f"🚨 ERRO: Arquivo .env não encontrado em: {env_path}")
+        logger.error("🚨 ERRO: Arquivo .env não encontrado em: %s", env_path)
         return False
 
     load_dotenv(dotenv_path=env_path)
 
     # Validação simples
     if not os.getenv("SECRET_KEY"):
-        print("⚠️ AVISO: SECRET_KEY não encontrada no arquivo .env")
+        logger.warning("⚠️ AVISO: SECRET_KEY não encontrada no arquivo .env")
         return False
 
-    print("🔐 Ambiente carregado com sucesso.")
+    logger.info("🔐 Ambiente carregado com sucesso.")
     return True
 
 

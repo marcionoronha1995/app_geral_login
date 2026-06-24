@@ -1,6 +1,6 @@
-python-dotenv
-flask
-pandas
-openpyxl
-ruff
-jupyter_http_over_ws
+python-dotenv==1.0.1
+Flask==3.0.3
+pandas==2.2.2
+openpyxl==3.1.5
+ruff==0.4.9
+jupyter-http-over-ws==0.0.8

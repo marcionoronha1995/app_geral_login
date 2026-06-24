@@ -19,7 +19,7 @@ def launch_server_external():
         f"start powershell -NoExit -ExecutionPolicy Bypass -Command "
         f"\"& {{ cd '{root}'; "
         f".\\.venv\\Scripts\\Activate.ps1; "
-        f'python src/backend/app.py }}"'
+        f'python -m src.backend.app }}"'
     )
 
     print("🚀 Abrindo servidor em janela externa do PowerShell...")

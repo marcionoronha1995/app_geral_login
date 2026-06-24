@@ -7,10 +7,7 @@ if hasattr(sys.stdout, "reconfigure"):
 
 from flask import Flask
 
-# Ajusta o caminho para encontrar a pasta 'src' e o 'secure_loader'
-# Sobe 2 níveis: de src/backend/ para a raiz app_geral_login
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../../")))
-
+from src.backend.core.exceptions import V8SecurityException
 from src.backend.core.secure_loader import load_secure_environment
 from v8_security_gate import secure_gate
 from v8_sentinel import sentinel
@@ -24,6 +21,18 @@ if load_secure_environment():
 else:
     print("❌ ERRO: Não foi possível carregar as configurações de segurança.")
     sys.exit(1)
+
+
+@app.errorhandler(V8SecurityException)
+def handle_v8_security_error(error):
+    """
+    Tratamento de exceção de segurança global:
+    Retorna uma resposta HTTP 403 (Forbidden) amigável em formato JSON.
+    """
+    return {
+        "status": "Erro de Permissão",
+        "mensagem": str(error)
+    }, 403
 
 
 @app.route("/")

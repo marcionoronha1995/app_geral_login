@@ -1,6 +1,8 @@
 import functools
 import os
 
+from src.backend.core.exceptions import V8SecurityException
+
 
 def secure_gate(required_permission):
     """
@@ -12,7 +14,7 @@ def secure_gate(required_permission):
         def wrapper(*args, **kwargs):
             # 1. Valida o ambiente em memória (Se o .env e as chaves básicas existem)
             if not os.getenv("SECRET_KEY"):
-                raise PermissionError("❌ Falha de Integridade: Ambiente inseguro (SECRET_KEY ausente).")
+                raise V8SecurityException("❌ Falha de Integridade: Ambiente inseguro (SECRET_KEY ausente).")
 
             # 2. Verifica a liberação da chave para esta função específica
             app_key = os.getenv("APP_SECURITY_KEY")
@@ -20,7 +22,7 @@ def secure_gate(required_permission):
                 expected_key = os.getenv("EXPECTED_APP_KEY")  # Definida de forma segura no ambiente
                 
                 if not app_key or not expected_key or app_key != expected_key:
-                    raise PermissionError(
+                    raise V8SecurityException(
                         f"❌ Acesso Negado: Função '{func.__name__}' não possui autorização ou chaves não conferem."
                     )
 
