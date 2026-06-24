@@ -39,7 +39,10 @@ def setup_environment():
     # 3. Verificações Essenciais (Limpeza de sistema e geração de .env)
     init_env.verify_essentials()
 
-    # 4. Abertura das Janelas de Serviço (PowerShell Externo)
+    # 4. Atualização automática do Selo de Integridade no Berço
+    run_step("Atualizando selo de integridade (Code Signing)", ["scripts/seal_project.py"])
+
+    # 5. Abertura das Janelas de Serviço (PowerShell Externo)
     launch_services(root)
 
 
