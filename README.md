@@ -49,7 +49,7 @@ app_geral_login /
 │       │   ├── secure_loader.py # Carregador de variáveis do .env e configuração de logs
 │       │   └── metadata/      # Chaves de segurança (.pem) e Manifesto assinado (.json)
 │       ├── database/        
-│       │   └── database_mock.py # Base mockada de verificação do Triple Lock
+│       │   └── database_mock.py # Conector de banco de dados (Supabase + fallback local com Bcrypt)
 │       └── app.py             # Servidor principal e endpoints de API (Flask)
 ├── tests/                     # Testes de integração
 ├── v8_security_gate.py        # Decorador (@secure_gate) para proteção de rotas via JWT
@@ -70,17 +70,24 @@ Verifique e instale as dependências com versões congeladas:
 python init_env.py
 ```
 
-### 2. Executar o Servidor (Orquestrador)
+### 2. Configurar Credenciais do Banco
+Preencha a URL e a Chave de Serviço no seu `.env` baseando-se nos placeholders:
+```env
+SUPABASE_URL=INSIRA_SEU_PROJECT_URL_AQUI
+SUPABASE_KEY=INSIRA_SUA_SERVICE_ROLE_KEY_AQUI
+```
+*Nota: Se deixadas em branco, o sistema ativará automaticamente o fallback simulado em memória local, mantendo o ambiente 100% testável offline.*
+
+### 3. Executar o Servidor (Orquestrador)
 Inicie a aplicação utilizando execução baseada em módulos Python (a partir do diretório raiz):
 ```bash
 python -m src.backend.app
 ```
 *(Nota: Durante a execução no "berço", o script `start_all.py` atualizará automaticamente o selo de integridade antes do boot).*
 
-### 3. Rodar os Testes Automatizados da API
+### 4. Rodar os Testes Automatizados da API
 Com o servidor rodando em um terminal, abra outro console e execute:
 ```bash
 python scripts/test_client.py
 ```
 O script testará automaticamente o bloqueio de chaves incorretas (HTTP 401), a emissão do Token JWT sob login correto (HTTP 200), o bloqueio de acessos sem token ou com tokens falsos (HTTP 403) e o consumo bem-sucedido com token válido.
-
